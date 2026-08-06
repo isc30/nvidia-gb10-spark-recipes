@@ -16,3 +16,10 @@ The most performant **and stable** recipes for running common models in your DGX
 ## Available recipes
 
 - [Qwen3.6-35B-A3B](./qwen3.6-35b-a3b/README.md)
+- [Qwen3.6-27B](./qwen3.6-27b/README.md)
+
+## Benchmarking
+
+```bash
+sparkrun -vvv benchmark run ./recipe.yaml -b served_model_name=qwen3.6-27b --profile spark-arena-v1
+```

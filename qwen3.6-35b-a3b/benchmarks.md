@@ -116,7 +116,8 @@ vars:
   max_num_batched_tokens: 32768
   max_num_seqs: 16
 
-* the most stable, and vram-usage effective
+* the most stable, performance and vram-usage effective
+* selected winner
 
 ┃ depth ┃ conc ┃ pp t/s ┃ tg t/s ┃ ttfr ms ┃ runs ┃
 │     0 │    1 │ 5714.8 │  101.3 │   362.2 │    3 │
@@ -181,6 +182,139 @@ vars:
 │ 32768 │    5 │ 1220.2 │  120.4 │  8035.4 │    3 │
 
 vllm version 0.23.1rc1.dev1302+ge765bbc97.d20260720
+```
+
+```bash
+THe-Plague/Qwen3.6-35B-A3B-abliterated-NVFP4-MTP
+--attention-backend FLASHINFER \
+--moe-backend FLASHINFER_CUTLASS \
+--speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"FLASHINFER","moe_backend":"FlashInfer CUTLASS"}' \
+
+container: eugr/spark-vllm:latest
+env:
+  VLLM_MARLIN_USE_ATOMIC_ADD: '1'
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 13438145445 # 2.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 24
+
+┃ depth ┃ conc ┃ pp t/s ┃ tg t/s ┃ ttfr ms ┃ runs ┃
+│     0 │    1 │ 5547.8 │   74.7 │   371.1 │    3 │
+│     0 │    2 │ 5070.8 │  117.6 │   785.8 │    3 │
+│     0 │    5 │ 6889.0 │  206.6 │  1473.6 │    3 │
+│     0 │   10 │ 7312.8 │  368.3 │  2791.9 │    3 │
+│  4096 │    1 │ 2116.9 │   71.7 │   969.0 │    3 │
+│  4096 │    2 │ 2263.9 │  115.4 │  1786.7 │    3 │
+│  4096 │    5 │ 2409.1 │  185.7 │  4233.3 │    3 │
+│  4096 │   10 │ 2464.2 │  280.9 │  8218.4 │    3 │
+│  8192 │    1 │ 1969.3 │   66.3 │  1042.2 │    3 │
+│  8192 │    2 │ 2110.7 │  113.4 │  1917.2 │    3 │
+│  8192 │    5 │ 2244.2 │  185.4 │  4542.0 │    3 │
+│  8192 │   10 │ 2297.1 │  277.8 │  8872.1 │    3 │
+│ 16384 │    1 │ 1628.6 │   60.4 │  1261.1 │    3 │
+│ 16384 │    2 │ 1881.1 │   92.1 │  2175.3 │    3 │
+│ 16384 │    5 │ 1987.4 │  173.2 │  5115.2 │    3 │
+│ 16384 │   10 │ 2142.5 │  279.9 │  9530.2 │    3 │
+│ 32768 │    1 │ 1509.4 │   62.7 │  1357.9 │    3 │
+│ 32768 │    2 │ 1642.6 │  112.9 │  2465.6 │    3 │
+│ 32768 │    5 │ 1768.1 │  174.9 │  5757.0 │    3 │
+
+vllm version 0.26.1rc1.dev371+g85ea44b46.d20260805
+```
+
+```bash
+THe-Plague/Qwen3.6-35B-A3B-abliterated-NVFP4-MTP
+--attention-backend FLASHINFER \
+--moe-backend MARLIN \
+--speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"triton_attn","moe_backend":"triton"}' \
+
+container: eugr/spark-vllm:latest
+env:
+  VLLM_MARLIN_USE_ATOMIC_ADD: '1'
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 13438145445 # 2.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 24
+
+* same config as the "winner" nvidia one (most stable and performant)
+
+┃  depth ┃ conc ┃ pp t/s ┃ tg t/s ┃  ttfr ms ┃ runs ┃
+│      0 │    1 │ 5378.1 │   77.3 │    384.2 │    3 │
+│      0 │    2 │ 5182.9 │  126.1 │    803.8 │    3 │
+│      0 │    5 │ 6553.9 │  195.9 │   1495.9 │    3 │
+│      0 │   10 │ 6759.9 │  278.4 │   2867.2 │    3 │
+│   4096 │    1 │ 1948.9 │   63.0 │   1053.7 │    3 │
+│   4096 │    2 │ 2002.7 │   92.8 │   1971.9 │    3 │
+│   4096 │    5 │ 2141.2 │  166.6 │   4506.2 │    3 │
+│   4096 │   10 │ 2239.5 │  209.6 │   8539.0 │    3 │
+│   8192 │    1 │ 1825.4 │   68.0 │   1125.9 │    3 │
+│   8192 │    2 │ 1922.5 │  103.1 │   1974.5 │    3 │
+│   8192 │    5 │ 2080.2 │  144.6 │   4698.3 │    3 │
+│   8192 │   10 │ 2137.2 │  186.6 │   9213.5 │    3 │
+│  16384 │    1 │ 1651.9 │   66.1 │   1241.3 │    3 │
+│  16384 │    2 │ 1736.1 │   94.6 │   2188.7 │    3 │
+│  16384 │    5 │ 1857.8 │  133.6 │   5259.4 │    3 │
+│  16384 │   10 │ 1900.3 │  162.4 │  10069.3 │    3 │
+│  32768 │    1 │ 1339.1 │   54.9 │   1532.7 │    3 │
+│  32768 │    2 │ 1529.0 │   70.0 │   2387.5 │    3 │
+│  32768 │    5 │ 1584.3 │  119.0 │   6191.4 │    3 │
+│  32768 │   10 │ 1639.4 │  132.3 │  11623.1 │    3 │
+│  65535 │    1 │  828.7 │   38.0 │   2473.6 │    3 │
+│  65535 │    2 │  865.7 │   63.4 │   4363.9 │    3 │
+│  65535 │    5 │  975.5 │   86.6 │  10007.6 │    3 │
+│  65535 │   10 │  863.8 │   67.8 │  20808.4 │    3 │
+│ 100000 │    1 │  626.1 │   47.3 │   3273.8 │    3 │
+│ 100000 │    2 │  673.8 │   55.1 │   5640.7 │    3 │
+│ 100000 │    5 │  717.4 │   73.0 │  13588.8 │    3 │
+│ 100000 │   10 │   68.5 │    4.9 │ 159905.0 │    3 │
+
+vllm version 0.26.1rc1.dev371+g85ea44b46.d20260805
+```
+
+```bash
+THe-Plague/Qwen3.6-35B-A3B-abliterated-NVFP4-MTP
+--attention-backend FLASHINFER \
+--moe-backend flashinfer_b12x \
+--speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"TRITON_ATTN","moe_backend":"flashinfer_cutlass"}' \
+
+container: eugr/spark-vllm:latest
+env:
+  VLLM_MARLIN_USE_ATOMIC_ADD: '1'
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 13438145445 # 2.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 24
+
+* flashinfer_b12x uses +20gb more VRAM than alternatives, not worth it for a single spark as it means you can only run 1 model
+
+┃ depth ┃ conc ┃ pp t/s ┃ tg t/s ┃ ttfr ms ┃ runs ┃
+│     0 │    1 │ 4683.2 │   58.2 │   438.9 │    3 │
+│     0 │    2 │ 6105.8 │   93.9 │   670.9 │    3 │
+│     0 │    5 │ 6146.1 │  148.7 │  1584.1 │    3 │
+│     0 │   10 │ 7296.3 │  282.3 │  2691.8 │    3 │
+│  4096 │    1 │ 1852.5 │   45.0 │  1108.7 │    3 │
+│  4096 │    2 │ 2214.2 │   93.4 │  1747.1 │    3 │
+│  4096 │    5 │ 2391.7 │  133.0 │  4015.4 │    3 │
+│  4096 │   10 │ 2496.2 │  189.6 │  7647.3 │    3 │
+│  8192 │    1 │ 1563.3 │   29.5 │  1339.0 │    3 │
+│  8192 │    2 │ 1971.2 │   77.8 │  1967.2 │    3 │
+│  8192 │    5 │ 2159.4 │  107.7 │  4487.7 │    3 │
+│  8192 │   10 │ 2272.5 │  204.9 │  8573.6 │    3 │
+│ 16384 │    1 │ 1536.4 │   55.7 │  1336.2 │    3 │
+│ 16384 │    2 │ 1771.9 │   77.1 │  2248.7 │    3 │
+│ 16384 │    5 │ 1936.0 │  137.1 │  4886.3 │    3 │
+│ 16384 │   10 │ 2035.9 │  157.0 │  9613.5 │    3 │
+│ 32768 │    1 │ 1356.8 │   52.2 │  1512.3 │    3 │
+│ 32768 │    2 │ 1485.6 │   70.7 │  2550.8 │    3 │
+│ 32768 │    5 │ 1652.3 │  112.3 │  5898.5 │    3 │
+
+vllm version 0.26.1rc1.dev371+g85ea44b46.d20260805
 ```
 
 ```bash

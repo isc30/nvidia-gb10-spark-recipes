@@ -52,6 +52,100 @@ vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
 ```bash
 nvidia/Qwen3.6-27B-NVFP4
 --quantization modelopt \
+--speculative-config '{"method":"mtp","num_speculative_tokens":3}' \
+
+container: eugr/spark-vllm:latest
+env:
+  CUTE_DSL_ARCH: sm_121a
+  TORCH_CUDA_ARCH_LIST: 12.1a
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 10070904965 # 1.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 16
+
+* probably unstable, but no crashes happened yet: speculative_attention_backend defaults to flashinfer, which can error randomly
+* uses MarlinNvFp4LinearKernel for NVFP4 GEMM (W4A16)
+* uses FlashInferFP8ScaledMMLinearKernel for ModelOptFp8LinearMethod
+
+┃ depth ┃ conc ┃ pp t/s ┃ tg t/s ┃  ttfr ms ┃ runs ┃
+│     0 │    1 │ 1040.8 │   28.1 │   1972.7 │    3 │
+│     0 │    2 │ 1035.8 │   47.7 │   3876.5 │    3 │
+│     0 │    5 │ 1126.7 │  107.1 │   9065.7 │    3 │
+│     0 │   10 │ 1135.1 │  162.6 │  18033.2 │    3 │
+│  4096 │    1 │  474.7 │   27.0 │   4316.1 │    3 │
+│  4096 │    2 │  487.1 │   51.2 │   8349.9 │    3 │
+│  4096 │    5 │  497.8 │  106.2 │  20539.8 │    3 │
+│  4096 │   10 │  493.6 │  172.3 │  41468.5 │    3 │
+│  8192 │    1 │  538.1 │   28.4 │   3807.3 │    3 │
+│  8192 │    2 │  554.1 │   50.2 │   7331.8 │    3 │
+│  8192 │    5 │  568.2 │  102.6 │  17987.8 │    3 │
+│  8192 │   10 │  568.6 │  163.7 │  35994.8 │    3 │
+│ 16384 │    1 │  481.0 │   28.9 │   4260.2 │    3 │
+│ 16384 │    2 │  495.9 │   47.7 │   8196.2 │    3 │
+│ 16384 │    5 │  510.2 │   98.4 │  20031.1 │    3 │
+│ 16384 │   10 │  506.4 │  154.5 │  40407.1 │    3 │
+│ 32768 │    1 │  391.9 │   25.3 │   5229.9 │    3 │
+│ 32768 │    2 │  402.7 │   48.3 │  10106.1 │    3 │
+│ 32768 │    5 │  411.3 │   95.8 │  24840.2 │    3 │
+│ 32768 │   10 │   75.2 │    6.3 │ 172238.6 │    3 │
+│ 65535 │    1 │  279.6 │   28.1 │   7327.9 │    3 │
+│ 65535 │    2 │  284.9 │   46.5 │  14301.5 │    3 │
+│ 65535 │    5 │  292.3 │   77.0 │  34961.8 │    3 │
+
+vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
+```
+
+```bash
+nvidia/Qwen3.6-27B-NVFP4
+--quantization modelopt \
+--speculative-config '{"method":"mtp","num_speculative_tokens":3}' \
+
+container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
+env:
+  CUTE_DSL_ARCH: sm_121a
+  TORCH_CUDA_ARCH_LIST: 12.1a
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 10070904965 # 1.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 16
+
+* probably unstable, but no crashes happened yet
+
+// PENDING with nightly container
+
+vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
+```
+
+```bash
+nvidia/Qwen3.6-27B-NVFP4
+--quantization modelopt \
+--speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"triton_attn"}' \
+
+container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
+env:
+  CUTE_DSL_ARCH: sm_121a
+  TORCH_CUDA_ARCH_LIST: 12.1a
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 10070904965 # 1.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 16
+
+* stable
+
+// PENDING with nightly container
+
+vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
+```
+
+```bash
+nvidia/Qwen3.6-27B-NVFP4
+--quantization modelopt \
 --attention-backend flashinfer \
 --speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"triton_attn"}' \
 

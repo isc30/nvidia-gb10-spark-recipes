@@ -545,6 +545,8 @@ nvidia/Qwen3.6-35B-A3B-NVFP4
 --quantization modelopt \
 --speculative-config '{"method":"mtp","num_speculative_tokens":3}' \
 
+* fallbacks to flashinfer+marlin (main model) and flashinfer+flashinfer_cutlass (mtp model)
+
 container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
 env:
   VLLM_MARLIN_USE_ATOMIC_ADD: '1'
@@ -595,6 +597,8 @@ vllm version 0.26.1rc1.dev371+g85ea44b46.d20260805
 nvidia/Qwen3.6-35B-A3B-NVFP4
 --quantization modelopt \
 --speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"triton_attn"}' \
+
+* fallbacks to flashinfer+marlin (main model) and flashinfer+triton_attn (mtp model)
 
 container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
 env:

@@ -1,7 +1,7 @@
 recipe_version: '1'
 model: nvidia/Qwen3.6-35B-A3B-NVFP4
 builder: isc30
-container: eugr/spark-vllm:latest
+container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
 mods:
   - mods/fix-qwen3.6-chat-template
 defaults:

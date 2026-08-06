@@ -1,6 +1,6 @@
 # Nvidia GB10 (Spark) Recipes
 
-The recipes in this repository have 2 core principles:
+The recipes in this repository follow 2 core principles:
 - The best performance
 - The best stability
 

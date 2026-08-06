@@ -505,7 +505,7 @@ vars:
   max_num_seqs: 24
 
 * same as the fast recipe in the new engine
-* probably UNSTABLE
+* probably UNSTABLE, hasnt crashed yet
 
 ┃  depth ┃ conc ┃ pp t/s ┃ tg t/s ┃  ttfr ms ┃ runs ┃
 │      0 │    1 │ 5213.5 │   73.9 │    397.8 │    3 │
@@ -536,6 +536,84 @@ vars:
 │ 100000 │    2 │  710.2 │   83.7 │   5730.2 │    3 │
 │ 100000 │    5 │  765.1 │  126.7 │  13321.6 │    3 │
 │ 100000 │   10 │   87.0 │    6.2 │ 130833.8 │    3 │
+
+vllm version 0.26.1rc1.dev371+g85ea44b46.d20260805
+```
+
+```bash
+nvidia/Qwen3.6-35B-A3B-NVFP4
+--quantization modelopt \
+--speculative-config '{"method":"mtp","num_speculative_tokens":3}' \
+
+container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
+env:
+  VLLM_MARLIN_USE_ATOMIC_ADD: '1'
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 13438145445 # 2.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 24
+
+* same as the fast recipe in the new engine
+* probably UNSTABLE, hasnt crashed yet
+
+┃  depth ┃ conc ┃ pp t/s ┃ tg t/s ┃  ttfr ms ┃ runs ┃
+│      0 │    1 │ 5570.9 │   92.5 │    369.4 │    3 │
+│      0 │    2 │ 4913.6 │  144.5 │    821.9 │    3 │
+│      0 │    5 │ 6495.5 │  236.7 │   1565.8 │    3 │
+│      0 │   10 │ 6933.3 │  372.7 │   2946.4 │    3 │
+│   4096 │    1 │ 2023.9 │  102.2 │   1013.5 │    3 │
+│   4096 │    2 │ 2147.2 │  160.4 │   1889.4 │    3 │
+│   4096 │    5 │ 2284.1 │  243.3 │   4470.0 │    3 │
+│   4096 │   10 │ 2314.0 │  318.6 │   8758.7 │    3 │
+│   8192 │    1 │ 1906.8 │  111.7 │   1076.2 │    3 │
+│   8192 │    2 │ 2005.8 │  160.4 │   2024.2 │    3 │
+│   8192 │    5 │ 2146.0 │  241.4 │   4756.4 │    3 │
+│   8192 │   10 │ 2172.4 │  340.3 │   9361.7 │    3 │
+│  16384 │    1 │ 1730.4 │  103.3 │   1185.3 │    3 │
+│  16384 │    2 │ 1812.3 │  164.4 │   2238.8 │    3 │
+│  16384 │    5 │ 1937.7 │  238.5 │   5261.9 │    3 │
+│  16384 │   10 │ 1957.9 │  238.2 │  10247.7 │    3 │
+│  32768 │    1 │ 1390.4 │   59.5 │   1476.5 │    3 │
+│  32768 │    2 │ 1520.6 │  105.5 │   2665.2 │    3 │
+│  32768 │    5 │ 1538.7 │  167.7 │   6646.2 │    3 │
+│  32768 │   10 │ 1719.7 │  258.6 │  11870.2 │    3 │
+│  65535 │    1 │  808.9 │   61.7 │   2593.2 │    3 │
+│  65535 │    2 │  961.3 │  101.6 │   4227.6 │    3 │
+│  65535 │    5 │ 1029.6 │  174.2 │   9897.1 │    3 │
+│  65535 │   10 │  911.4 │  149.5 │  20720.7 │    3 │
+│ 100000 │    1 │  662.4 │   53.5 │   3095.6 │    3 │
+│ 100000 │    2 │  741.3 │  121.6 │   5492.2 │    3 │
+│ 100000 │    5 │  771.2 │   89.8 │  12551.4 │    3 │
+│ 100000 │   10 │   88.3 │    6.7 │ 124913.0 │    3 │
+
+vllm version 0.26.1rc1.dev371+g85ea44b46.d20260805
+```
+
+```bash
+nvidia/Qwen3.6-35B-A3B-NVFP4
+--quantization modelopt \
+--speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"triton_attn"}' \
+
+container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
+env:
+  VLLM_MARLIN_USE_ATOMIC_ADD: '1'
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 13438145445 # 2.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 24
+
+* added attention_backend:triton_attn, same as the safe recipe but in the new engine
+* stable
+
+┃ depth ┃ conc ┃ pp t/s ┃ tg t/s ┃ ttfr ms ┃ runs ┃
+│     0 │    1 │ 5739.5 │   97.2 │   359.2 │    3 │
+│     0 │    2 │ 5006.2 │  136.5 │   769.1 │    3 │
+│     0 │    5 │ 6498.8 │  202.0 │  1462.6 │    3 │
+│     0 │   10 │ 6841.6 │  261.2 │  2917.2 │    3 │
 
 vllm version 0.26.1rc1.dev371+g85ea44b46.d20260805
 ```

@@ -402,6 +402,149 @@ nvidia/Qwen3.6-35B-A3B-NVFP4
 --quantization modelopt \
 --attention-backend flashinfer \
 --moe-backend marlin \
+--speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"triton_attn","moe_backend":"flashinfer_cutlass"}' \
+
+container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
+env:
+  VLLM_MARLIN_USE_ATOMIC_ADD: '1'
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 13438145445 # 2.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 24
+
+* as little vram usage as triton speculative moe backend, very similar
+
+┃ depth ┃ conc ┃ pp t/s ┃ tg t/s ┃ ttfr ms ┃ runs ┃
+│     0 │    1 │ 5515.6 │   98.3 │   375.3 │    3 │
+│     0 │    2 │ 4985.2 │  135.4 │   770.5 │    3 │
+│     0 │    5 │ 6487.2 │  194.0 │  1466.7 │    3 │
+│     0 │   10 │ 6950.3 │  268.3 │  2835.6 │    3 │
+│  4096 │    1 │ 1931.9 │  106.5 │  1064.7 │    3 │
+│  4096 │    2 │ 2096.8 │  134.1 │  1790.8 │    3 │
+│  4096 │    5 │ 2275.5 │  169.0 │  4278.0 │    3 │
+│  4096 │   10 │ 2298.1 │  211.5 │  8495.1 │    3 │
+│  8192 │    1 │ 1864.3 │   99.1 │  1100.3 │    3 │
+│  8192 │    2 │ 1948.6 │  134.7 │  1930.2 │    3 │
+│  8192 │    5 │ 2130.2 │  166.1 │  4568.2 │    3 │
+│  8192 │   10 │ 2143.2 │  198.4 │  9046.7 │    3 │
+│ 16384 │    1 │ 1690.9 │  103.6 │  1214.0 │    3 │
+│ 16384 │    2 │ 1774.0 │  124.7 │  2123.0 │    3 │
+│ 16384 │    5 │ 1884.6 │  159.9 │  5158.1 │    3 │
+│ 16384 │   10 │ 1927.9 │  149.3 │  9466.8 │    3 │
+│ 32768 │    1 │ 1375.1 │   79.7 │  1508.1 │    3 │
+│ 32768 │    2 │ 1446.8 │   91.0 │  2625.5 │    3 │
+
+vllm version 0.26.1rc1.dev371+g85ea44b46.d20260805
+```
+
+```bash
+nvidia/Qwen3.6-35B-A3B-NVFP4
+--quantization modelopt \
+--attention-backend flashinfer \
+--moe-backend marlin \
+--speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"triton_attn","moe_backend":"triton"}' \
+
+container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
+env:
+  VLLM_MARLIN_USE_ATOMIC_ADD: '1'
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 13438145445 # 2.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 24
+
+* same as the winning recipe in the new engine
+
+┃ depth ┃ conc ┃ pp t/s ┃ tg t/s ┃ ttfr ms ┃ runs ┃
+│     0 │    1 │ 5696.8 │   94.1 │   364.0 │    3 │
+│     0 │    2 │ 4952.9 │  135.8 │   782.5 │    3 │
+│     0 │    5 │ 6608.7 │  194.6 │  1437.6 │    3 │
+│     0 │   10 │ 6990.6 │  292.4 │  2820.8 │    3 │
+│  4096 │    1 │ 1941.8 │  100.6 │  1059.3 │    3 │
+│  4096 │    2 │ 2109.5 │  126.1 │  1780.5 │    3 │
+│  4096 │    5 │ 2272.5 │  166.2 │  4284.3 │    3 │
+│  4096 │   10 │ 2293.9 │  202.6 │  8509.9 │    3 │
+│  8192 │    1 │ 1864.3 │  102.5 │  1100.1 │    3 │
+│  8192 │    2 │ 1959.6 │  124.9 │  1918.5 │    3 │
+│  8192 │    5 │ 2124.4 │  161.5 │  4581.2 │    3 │
+│  8192 │   10 │ 2144.4 │  204.1 │  9155.2 │    3 │
+│ 16384 │    1 │ 1698.5 │   97.9 │  1208.8 │    3 │
+│ 16384 │    2 │ 1764.7 │  123.4 │  2133.9 │    3 │
+│ 16384 │    5 │ 1904.9 │  139.1 │  5105.9 │    3 │
+│ 16384 │   10 │ 1895.6 │  172.8 │ 10199.2 │    3 │
+│ 32768 │    1 │ 1343.4 │   62.9 │  1528.3 │    3 │
+│ 32768 │    2 │ 1440.9 │   65.5 │  2635.3 │    3 │
+│ 32768 │    5 │ 1602.7 │  105.3 │  6088.2 │    3 │
+│ 32768 │   10 │ 1654.3 │  133.7 │ 11353.0 │    3 │
+│ 65535 │    1 │  851.8 │   47.9 │  2405.8 │    3 │
+│ 65535 │    2 │  952.0 │   98.3 │  3939.1 │    3 │
+│ 65535 │    5 │ 1004.8 │   88.7 │  9043.1 │    3 │
+│ 65535 │   10 │  599.4 │   44.5 │ 31615.4 │    3 │
+
+vllm version 0.26.1rc1.dev371+g85ea44b46.d20260805
+```
+
+```bash
+nvidia/Qwen3.6-35B-A3B-NVFP4
+--quantization modelopt \
+--attention-backend flashinfer \
+--moe-backend triton \
+--speculative-config '{"method":"mtp","num_speculative_tokens":3,"moe_backend":"triton"}' \
+
+container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
+env:
+  VLLM_MARLIN_USE_ATOMIC_ADD: '1'
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 13438145445 # 2.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 24
+
+* same as the fast recipe in the new engine
+* probably UNSTABLE
+
+┃  depth ┃ conc ┃ pp t/s ┃ tg t/s ┃  ttfr ms ┃ runs ┃
+│      0 │    1 │ 5213.5 │   73.9 │    397.8 │    3 │
+│      0 │    2 │ 5803.6 │  108.5 │    706.2 │    3 │
+│      0 │    5 │ 6482.5 │  189.2 │   1562.4 │    3 │
+│      0 │   10 │ 6837.3 │  286.6 │   2969.1 │    3 │
+│   4096 │    1 │ 1861.2 │   61.0 │   1103.8 │    3 │
+│   4096 │    2 │ 2023.8 │   91.3 │   1992.7 │    3 │
+│   4096 │    5 │ 2240.6 │  223.4 │   4538.8 │    3 │
+│   4096 │   10 │ 2298.8 │  323.6 │   8880.2 │    3 │
+│   8192 │    1 │ 1907.5 │  100.2 │   1075.4 │    3 │
+│   8192 │    2 │ 2014.3 │  163.4 │   2015.2 │    3 │
+│   8192 │    5 │ 2152.1 │  240.1 │   4740.9 │    3 │
+│   8192 │   10 │ 2178.5 │  326.6 │   9341.9 │    3 │
+│  16384 │    1 │ 1713.7 │  104.8 │   1196.6 │    3 │
+│  16384 │    2 │ 1810.1 │  146.1 │   2243.3 │    3 │
+│  16384 │    5 │ 1945.4 │  238.1 │   5239.6 │    3 │
+│  16384 │   10 │ 1980.3 │  206.3 │  10040.9 │    3 │
+│  32768 │    1 │ 1506.5 │  101.5 │   1360.9 │    3 │
+│  32768 │    2 │ 1597.4 │  152.5 │   2542.3 │    3 │
+│  32768 │    5 │ 1656.6 │  178.8 │   6072.5 │    3 │
+│  32768 │   10 │ 1726.1 │  261.9 │  11823.0 │    3 │
+│  65535 │    1 │  878.0 │   52.7 │   2336.6 │    3 │
+│  65535 │    2 │  970.8 │  111.8 │   4189.2 │    3 │
+│  65535 │    5 │ 1053.9 │  106.8 │   9191.3 │    3 │
+│  65535 │   10 │  818.8 │   75.8 │  29113.8 │    3 │
+│ 100000 │    1 │  652.7 │   53.8 │   3141.2 │    3 │
+│ 100000 │    2 │  710.2 │   83.7 │   5730.2 │    3 │
+│ 100000 │    5 │  765.1 │  126.7 │  13321.6 │    3 │
+│ 100000 │   10 │   87.0 │    6.2 │ 130833.8 │    3 │
+
+vllm version 0.26.1rc1.dev371+g85ea44b46.d20260805
+```
+
+```bash
+nvidia/Qwen3.6-35B-A3B-NVFP4
+--quantization modelopt \
+--attention-backend flashinfer \
+--moe-backend marlin \
 --speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"triton_attn","moe_backend":"triton"}' \
 
 container: eugr/spark-vllm:latest

@@ -42,12 +42,13 @@ command: |
     --quantization modelopt \
     --speculative-config '{"method":"mtp","num_speculative_tokens":3}' \
 env:
+  # recipe-specific
+  VLLM_MARLIN_USE_ATOMIC_ADD: '1'
   # defaults for gb10
   CUTE_DSL_ARCH: sm_121a
   TORCH_CUDA_ARCH_LIST: 12.1a
   ENABLE_NVFP4_SM100: 0
   # vllm
-  VLLM_MARLIN_USE_ATOMIC_ADD: '1'
   VLLM_HTTP_TIMEOUT_KEEP_ALIVE: '600'
   # cache
   PYTORCH_CUDA_ALLOC_CONF: 'expandable_segments:True'

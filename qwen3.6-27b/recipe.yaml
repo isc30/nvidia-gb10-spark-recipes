@@ -9,8 +9,8 @@ defaults:
   port: 8001
   host: 0.0.0.0
   tensor_parallel: 1
-  gpu_memory_utilization: 0.8 # SINGLE-MODEL
-  kv_cache_memory: 20042098000 # MULTI-MODEL # 1.0x=9971193034
+  gpu_memory_utilization: 0.8 # KEEP LINE ONLY IF SINGLE-MODEL
+  kv_cache_memory: 20042098000 # KEEP LINE ONLY IF MULTI-MODEL # 1.0x=9971193034
   max_model_len: 262144
   max_num_batched_tokens: 32768
   max_num_seqs: 24
@@ -45,12 +45,13 @@ env:
   # defaults for gb10
   CUTE_DSL_ARCH: sm_121a
   TORCH_CUDA_ARCH_LIST: 12.1a
-  ENABLE_NVFP4_SM100: 0
+  ENABLE_NVFP4_SM100: '0'
+  PYTORCH_CUDA_ALLOC_CONF: 'expandable_segments:True'
   # vllm
   VLLM_MARLIN_USE_ATOMIC_ADD: '1'
   VLLM_HTTP_TIMEOUT_KEEP_ALIVE: '600'
+  CUDA_MODULE_LOADING: LAZY
   # cache
-  PYTORCH_CUDA_ALLOC_CONF: 'expandable_segments:True'
   VLLM_CACHE_ROOT: /cache/huggingface/vllm-cache
   TRITON_CACHE_DIR: /cache/huggingface/triton-cache
   TORCHINDUCTOR_CACHE_DIR: /cache/huggingface/torchinductor-cache

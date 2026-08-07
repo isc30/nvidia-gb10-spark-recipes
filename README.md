@@ -17,6 +17,7 @@ The most performant **and stable** recipes for running common models in your DGX
 
 - [Qwen3.6-35B-A3B](./qwen3.6-35b-a3b/README.md)
 - [Qwen3.6-27B](./qwen3.6-27b/README.md)
+- [Deepseek V3 Flash 0731](./deepseek-v3-flash-0731/README.md)
 
 ## Benchmarking
 

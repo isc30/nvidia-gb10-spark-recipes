@@ -505,7 +505,7 @@ vars:
   max_num_seqs: 24
 
 * same as the fast recipe in the new engine
-* probably UNSTABLE, hasnt crashed yet
+* UNSTABLE, cuda crashes
 
 ┃  depth ┃ conc ┃ pp t/s ┃ tg t/s ┃  ttfr ms ┃ runs ┃
 │      0 │    1 │ 5213.5 │   73.9 │    397.8 │    3 │
@@ -558,7 +558,7 @@ vars:
   max_num_seqs: 24
 
 * same as the fast recipe in the new engine
-* probably UNSTABLE, hasnt crashed yet
+* UNSTABLE, cuda crashes
 
 ┃  depth ┃ conc ┃ pp t/s ┃ tg t/s ┃  ttfr ms ┃ runs ┃
 │      0 │    1 │ 5570.9 │   92.5 │    369.4 │    3 │

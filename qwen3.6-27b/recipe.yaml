@@ -40,7 +40,7 @@ command: |
     --override-generation-config '{"temperature":0.6,"top_p":0.95,"top_k":20,"min_p":0.0,"presence_penalty":0.0,"repetition_penalty":1.1}' \
     --chat-template fixed_chat_template.jinja \
     --quantization modelopt \
-    --speculative-config '{"method":"mtp","num_speculative_tokens":3}' \
+    --speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"triton_attn"}' \
 env:
   # defaults for gb10
   CUTE_DSL_ARCH: sm_121a

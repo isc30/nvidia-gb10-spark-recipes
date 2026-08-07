@@ -65,7 +65,7 @@ vars:
   max_num_batched_tokens: 32768
   max_num_seqs: 16
 
-* probably unstable, but no crashes happened yet: speculative_attention_backend defaults to flashinfer, which can error randomly
+* UNSTABLE, cuda crashes, speculative_attention_backend defaults to flashinfer, which can error randomly
 * uses MarlinNvFp4LinearKernel for NVFP4 GEMM (W4A16)
 * uses FlashInferFP8ScaledMMLinearKernel for ModelOptFp8LinearMethod
 

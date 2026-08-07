@@ -54,7 +54,7 @@ nvidia/Qwen3.6-27B-NVFP4
 --quantization modelopt \
 --speculative-config '{"method":"mtp","num_speculative_tokens":3}' \
 
-container: eugr/spark-vllm:latest
+container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
 env:
   CUTE_DSL_ARCH: sm_121a
   TORCH_CUDA_ARCH_LIST: 12.1a
@@ -101,56 +101,10 @@ Swap:           15Gi          0B        15Gi
 │ 100000 │    1 │  265.8 │   26.4 │   7706.7 │    3 │
 │ 100000 │    2 │  275.3 │   41.6 │  14793.7 │    3 │
 │ 100000 │    5 │   30.6 │    2.7 │ 201088.6 │    3 │
-// wait for finish
 
 vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
 ```
 
-```bash
-nvidia/Qwen3.6-27B-NVFP4
---quantization modelopt \
---speculative-config '{"method":"mtp","num_speculative_tokens":3}' \
-
-container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
-env:
-  CUTE_DSL_ARCH: sm_121a
-  TORCH_CUDA_ARCH_LIST: 12.1a
-vars:
-  gpu_memory_utilization: 0.4
-  kv_cache_memory: 10070904965 # 1.01x
-  max_model_len: 262144
-  max_num_batched_tokens: 32768
-  max_num_seqs: 16
-
-* probably unstable, but no crashes happened yet
-
-// PENDING with nightly container
-
-vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
-```
-
-```bash
-nvidia/Qwen3.6-27B-NVFP4
---quantization modelopt \
---speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"triton_attn"}' \
-
-container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
-env:
-  CUTE_DSL_ARCH: sm_121a
-  TORCH_CUDA_ARCH_LIST: 12.1a
-vars:
-  gpu_memory_utilization: 0.4
-  kv_cache_memory: 10070904965 # 1.01x
-  max_model_len: 262144
-  max_num_batched_tokens: 32768
-  max_num_seqs: 16
-
-* stable
-
-// PENDING with nightly container
-
-vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
-```
 
 ```bash
 nvidia/Qwen3.6-27B-NVFP4
@@ -189,7 +143,6 @@ vars:
 │ 16384 │    1 │  483.3 │   26.8 │  4239.0 │    3 │
 │ 16384 │    2 │  491.5 │   43.8 │  7995.9 │    3 │
 │ 16384 │    5 │  496.8 │   68.8 │ 20035.9 │    3 │
-
 
 vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
 ```

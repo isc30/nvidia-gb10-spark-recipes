@@ -270,6 +270,55 @@ vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
 ```
 
 ```bash
+sakamakismile/Huihui-Qwen3.6-27B-abliterated-NVFP4-MTP
+--quantization modelopt \
+--speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"triton_attn"}' \
+
+container: eugr/spark-vllm:latest
+env:
+  CUTE_DSL_ARCH: sm_121a
+  TORCH_CUDA_ARCH_LIST: 12.1a
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 20042098000 # 1.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 24
+
+* stable
+* Using FlashInferCutlassNvFp4LinearKernel for NVFP4 GEMM (W4A4)
+
+┃  depth ┃ conc ┃ pp t/s ┃ tg t/s ┃  ttfr ms ┃ runs ┃
+│      0 │    1 │ 2285.2 │   24.6 │    901.3 │    3 │
+│      0 │    2 │ 2297.2 │   44.9 │   1755.4 │    3 │
+│      0 │    5 │ 1977.4 │   95.0 │   5089.4 │    3 │
+│      0 │   10 │ 1615.4 │  109.6 │  12365.8 │    3 │
+│   4096 │    1 │  995.2 │   24.2 │   2059.8 │    3 │
+│   4096 │    2 │ 1021.4 │   44.7 │   4009.4 │    3 │
+│   4096 │    5 │  884.6 │  104.8 │  11573.9 │    3 │
+│   4096 │   10 │  713.3 │   98.4 │  28249.9 │    3 │
+│   8192 │    1 │  938.4 │   23.9 │   2184.9 │    3 │
+│   8192 │    2 │ 1157.4 │   43.6 │   3538.2 │    3 │
+│   8192 │    5 │  973.8 │   83.9 │  10241.1 │    3 │
+│   8192 │   10 │  843.1 │  105.7 │  23432.5 │    3 │
+│  16384 │    1 │  883.8 │   22.5 │   2322.8 │    3 │
+│  16384 │    2 │  956.9 │   43.0 │   4097.7 │    3 │
+│  16384 │    5 │  831.2 │   75.8 │  11832.9 │    3 │
+│  16384 │   10 │  740.1 │   91.9 │  26070.5 │    3 │
+│  32768 │    1 │  653.8 │   21.3 │   3135.3 │    3 │
+│  32768 │    2 │  677.5 │   43.0 │   5905.9 │    3 │
+│  32768 │    5 │  617.6 │   59.2 │  15828.8 │    3 │
+│  32768 │   10 │  105.9 │    8.8 │ 115348.1 │    3 │
+│  65535 │    1 │  419.1 │   22.2 │   4889.1 │    3 │
+│  65535 │    2 │  413.3 │   35.5 │   9460.6 │    3 │
+│  65535 │    5 │  388.6 │   54.0 │  25610.4 │    3 │
+│  65535 │   10 │   40.9 │    3.0 │ 282860.1 │    3 │
+│ 100000 │    1 │  353.0 │   20.0 │   5804.4 │    3 │
+
+vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
+```
+
+```bash
 unsloth/Qwen3.6-27B-NVFP4
 --attention-backend flashinfer \
 --speculative-config '{"method":"mtp","num_speculative_tokens":3}' \
@@ -301,6 +350,49 @@ vars:
 │  8192 │    1 │  899.4 │   24.6 │  2280.0 │    3 │
 │  8192 │    2 │  883.6 │   49.5 │  4571.2 │    3 │
 │  8192 │    5 │  644.8 │  100.7 │ 15846.3 │    3 │
+
+vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
+```
+
+```bash
+unsloth/Qwen3.6-27B-NVFP4
+--speculative-config '{"method":"mtp","num_speculative_tokens":3,"attention_backend":"triton_attn"}' \
+
+container: eugr/spark-vllm:latest
+env:
+  CUTE_DSL_ARCH: sm_121a
+  TORCH_CUDA_ARCH_LIST: 12.1a
+vars:
+  gpu_memory_utilization: 0.4
+  kv_cache_memory: 20042098000 # 2.01x
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 16
+
+* stable
+* uses FlashInferCutlassNvFp4LinearKernel for NVFP4 GEMM (W4A4)
+* uses CutlassFP8ScaledMMLinearKernel for CompressedTensorsW8A8Fp8
+
+┃ depth ┃ conc ┃ pp t/s ┃ tg t/s ┃ ttfr ms ┃ runs ┃
+│     0 │    1 │ 2076.0 │   26.3 │   992.0 │    3 │
+│     0 │    2 │ 1772.7 │   42.9 │  2275.6 │    3 │
+│     0 │    5 │ 1467.9 │   84.4 │  6631.4 │    3 │
+│     0 │   10 │ 1315.9 │  105.5 │ 15148.7 │    3 │
+│  4096 │    1 │  845.2 │   25.5 │  2425.9 │    3 │
+│  4096 │    2 │  727.5 │   47.5 │  5532.5 │    3 │
+│  4096 │    5 │  606.8 │   90.6 │ 16602.4 │    3 │
+│  4096 │   10 │  560.1 │  101.6 │ 35918.4 │    3 │
+│  8192 │    1 │  917.5 │   26.2 │  2236.2 │    3 │
+│  8192 │    2 │  886.2 │   48.2 │  4537.4 │    3 │
+│  8192 │    5 │  675.4 │  101.6 │ 15159.9 │    3 │
+│  8192 │   10 │  653.0 │  105.9 │ 29948.6 │    3 │
+│ 16384 │    1 │  783.2 │   25.4 │  2617.3 │    3 │
+│ 16384 │    2 │  738.5 │   48.9 │  5445.8 │    3 │
+│ 16384 │    5 │  618.5 │   72.6 │ 15572.3 │    3 │
+│ 16384 │   10 │  573.0 │   74.4 │ 34181.1 │    3 │
+│ 32768 │    1 │  584.2 │   24.1 │  3507.6 │    3 │
+│ 32768 │    2 │  559.4 │   37.9 │  6830.1 │    3 │
+// RUNNING
 
 vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
 ```

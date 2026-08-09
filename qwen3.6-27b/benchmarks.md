@@ -367,7 +367,7 @@ vars:
   kv_cache_memory: 20042098000 # 2.01x
   max_model_len: 262144
   max_num_batched_tokens: 32768
-  max_num_seqs: 16
+  max_num_seqs: 24
 
 * stable
 * uses FlashInferCutlassNvFp4LinearKernel for NVFP4 GEMM (W4A4)
@@ -392,7 +392,6 @@ vars:
 │ 16384 │   10 │  573.0 │   74.4 │ 34181.1 │    3 │
 │ 32768 │    1 │  584.2 │   24.1 │  3507.6 │    3 │
 │ 32768 │    2 │  559.4 │   37.9 │  6830.1 │    3 │
-// RUNNING
 
 vllm version 0.26.1rc1.dev298+g1ea84d74b.d20260803
 ```

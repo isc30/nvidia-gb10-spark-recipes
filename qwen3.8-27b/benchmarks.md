@@ -72,3 +72,73 @@ defaults:
 │  32768 │    5 │   84.7 │    5.7 │  65879.8 │    3 │
 │  32768 │   10 │   74.8 │    4.8 │ 148175.3 │    3 │
 ```
+
+```
+recipe_version: '1'
+model: RadixArk/Qwen3.8-27B-NVFP4
+builder: isc30
+container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
+build_args:
+  - '--apply-vllm-pr'
+  - '52816'
+mods:
+  - mods/dflash2-nvfp4-lmhead
+defaults:
+  served_model_name: qwen3-27b
+  port: 8001
+  host: 0.0.0.0
+  tensor_parallel: 1
+  gpu_memory_utilization: 0.3 # KEEP LINE ONLY IF SINGLE-MODEL
+  kv_cache_memory: 20042098000 # KEEP LINE ONLY IF MULTI-MODEL # 1.0x=9971193034
+  max_model_len: 262144
+  max_num_batched_tokens: 32768
+  max_num_seqs: 24
+command: |
+  vllm serve RadixArk/Qwen3.8-27B-NVFP4 \
+    --host {host} \
+    --port {port} \
+    --served-model-name {served_model_name} \
+    --tensor-parallel-size {tensor_parallel} \
+    --optimization-level 3 \
+    --trust-remote-code \
+    --kv-cache-dtype fp8 \
+    --load-format safetensors \
+    --gpu-memory-utilization {gpu_memory_utilization} \
+    --kv-cache-memory {kv_cache_memory} \
+    --max-model-len {max_model_len} \
+    --max-num-batched-tokens {max_num_batched_tokens} \
+    --max-num-seqs {max_num_seqs} \
+    --enable-chunked-prefill \
+    --async-scheduling \
+    --enable-prefix-caching \
+    --skip-mm-profiling \
+    --reasoning-parser qwen3 \
+    --enable-auto-tool-choice \
+    --tool-call-parser qwen3_xml \
+    --default-chat-template-kwargs '{"preserve_thinking":true,"reasoning_effort":"xhigh"}' \
+    --generation-config auto \
+    --override-generation-config '{"temperature":1.0,"top_p":0.95,"top_k":20,"min_p":0.0,"presence_penalty":0.0,"repetition_penalty":1.0}' \
+    --speculative-config '{"method":"dflash","model":"incoai/Qwen3.8-27B-DFlash2","num_speculative_tokens":8}' \
+env:
+  # defaults for gb10
+  CUTE_DSL_ARCH: sm_121a
+  TORCH_CUDA_ARCH_LIST: 12.1a
+  ENABLE_NVFP4_SM100: '0'
+  PYTORCH_CUDA_ALLOC_CONF: 'expandable_segments:True'
+  # vllm
+  VLLM_MARLIN_USE_ATOMIC_ADD: '1'
+  VLLM_HTTP_TIMEOUT_KEEP_ALIVE: '600'
+  CUDA_MODULE_LOADING: LAZY
+  FLASHINFER_DISABLE_VERSION_CHECK: '1'
+  # cache
+  VLLM_CACHE_ROOT: /cache/huggingface/vllm-cache
+  TRITON_CACHE_DIR: /cache/huggingface/triton-cache
+  TORCHINDUCTOR_CACHE_DIR: /cache/huggingface/torchinductor-cache
+  TORCHINDUCTOR_FX_GRAPH_CACHE: '1'
+  # build
+  MAX_JOBS: '4'
+  NVCC_THREADS: '2'
+  FLASHINFER_NVCC_THREADS: '2'
+
+
+```

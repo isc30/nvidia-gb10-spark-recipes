@@ -1,12 +1,7 @@
 recipe_version: '1'
-model: Inferact/Qwen3.8-27B-NVFP4
+model: RadixArk/Qwen3.8-27B-NVFP4
 builder: isc30
 container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
-build_args:
-  - '--apply-vllm-pr'
-  - '52816'
-# mods:
-#   - mods/dflash2-nvfp4-lmhead
 defaults:
   served_model_name: qwen3-27b
   port: 8001
@@ -15,10 +10,10 @@ defaults:
   gpu_memory_utilization: 0.3 # KEEP LINE ONLY IF SINGLE-MODEL
   kv_cache_memory: 20042098000 # KEEP LINE ONLY IF MULTI-MODEL # 1.0x=9971193034
   max_model_len: 262144
-  max_num_batched_tokens: 32768
-  max_num_seqs: 24
+  max_num_batched_tokens: 16384
+  max_num_seqs: 8
 command: |
-  vllm serve Inferact/Qwen3.8-27B-NVFP4 \
+  vllm serve RadixArk/Qwen3.8-27B-NVFP4 \
     --host {host} \
     --port {port} \
     --served-model-name {served_model_name} \
@@ -42,7 +37,7 @@ command: |
     --default-chat-template-kwargs '{"preserve_thinking":true,"reasoning_effort":"xhigh"}' \
     --generation-config auto \
     --override-generation-config '{"temperature":1.0,"top_p":0.95,"top_k":20,"min_p":0.0,"presence_penalty":0.0,"repetition_penalty":1.0}' \
-    --speculative-config '{"method":"dflash","model":"z-lab/Qwen3.8-27B-DFlash2","num_speculative_tokens":7}' \
+    --speculative-config '{"method":"dflash","model":"incoai/Qwen3.8-27B-DFlash2","num_speculative_tokens":8}' \
 env:
   # defaults for gb10
   CUTE_DSL_ARCH: sm_121a

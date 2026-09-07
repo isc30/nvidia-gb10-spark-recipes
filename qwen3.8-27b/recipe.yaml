@@ -1,5 +1,5 @@
 recipe_version: '1'
-model: RadixArk/Qwen3.8-27B-NVFP4
+model: unsloth/Qwen3.8-27B-NVFP4
 builder: isc30
 container: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
 defaults:
@@ -13,7 +13,7 @@ defaults:
   max_num_batched_tokens: 16384
   max_num_seqs: 8
 command: |
-  vllm serve RadixArk/Qwen3.8-27B-NVFP4 \
+  vllm serve unsloth/Qwen3.8-27B-NVFP4 \
     --host {host} \
     --port {port} \
     --served-model-name {served_model_name} \
